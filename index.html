@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sistema de Chamados (Frontend)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="light">
+  <div class="shell">
+    <div id="drawer" class="drawer">
+      <div class="sbar">
+        <div class="sbar-head">
+          <div class="sbar-logo">NTDESK</div>
+        </div>
+        
+        
+        <div class="sbar-group open">
+          <button class="sbar-group-head" type="button">Meus chamados<span class="chev">&rsaquo;</span></button>
+          <div class="sbar-group-body">
+            <button class="sbar-item" data-filter="EM_ANDAMENTO">Em atendimento <span class="badge" data-badge="EM_ANDAMENTO">0</span></button>
+            <button class="sbar-item" data-filter="FECHADO">Fechado <span class="badge" data-badge="FECHADO">0</span></button>
+            <button class="sbar-item" data-filter="ABERTO">Contestado <span class="badge">0</span></button>
+            <button class="sbar-item" data-filter="ABERTO">Abertos <span class="badge" data-badge="ABERTO">0</span></button>
+            
+          </div>
+        </div>
+        <div class="sbar-group">
+          <button class="sbar-group-head" type="button">Outros<span class="chev">&rsaquo;</span></button>
+          <div class="sbar-group-body">
+            <button class="sbar-item" data-filter="ABERTO">Aguardando aprovacao <span class="badge">0</span></button>
+            <button class="sbar-item" data-filter="EM_ANDAMENTO">Colaborando <span class="badge">0</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button id="toggle-drawer" class="drawer-toggle" aria-label="Abrir menu">&#9776;</button>
+    <img src="assets/logo-para.svg" alt="Governo do Para" class="drawer-logo">
+    <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+    <div class="main">
+      <header class="appbar">
+        <nav class="tabs">
+          <button class="tab active" data-tab="tickets">Chamado</button>
+          <button class="tab" data-tab="admin">Atendimentos</button>
+          <button class="tab" data-tab="dashboard">Dashboard</button>
+        </nav>
+        <div id="user-wrap" class="user-wrap">
+          <button id="user-btn" class="user-btn" aria-haspopup="true" aria-expanded="false" title="Conta">
+            <span class="user-ico">👤</span>
+            <span class="user-info">
+              <span class="user-name">Usuário</span>
+              <span class="user-sub"></span>
+            </span>
+            <span class="user-caret">▾</span>
+          </button>
+          <div id="user-menu" class="user-menu">
+            <button class="user-item" data-action="dashboard">Dashboard</button>
+            <button class="user-item" data-action="meus-dados">Meus Dados</button>
+            <button class="user-item" data-action="relatorio">Relatório de Acesso</button>
+            <button class="user-item" data-action="senha">Alteração de Senha</button>
+            <button class="user-item danger" data-action="logout">Efetuar Logout</button>
+          </div>
+        </div>
+      </header>
+      <main class="container grid-cards">
+        <div id="tickets-section" class="stack">
+          <div class="workspace">
+            <section class="card card-elev ws-left">
+              <div class="card-head">
+                <h2 class="card-title">Novo Chamado</h2>
+              </div>
+              <form id="novo-form" class="form-grid">
+                <div class="field">
+                  <label for="titulo">Titulo</label>
+                  <input id="titulo" name="titulo" required maxlength="120" placeholder="Descreva o titulo do chamado">
+                </div>
+                <div class="field">
+                  <label for="descricao">Descricao</label>
+                  <textarea id="descricao" name="descricao" required rows="4" placeholder="Detalhe o problema ou solicitacao"></textarea>
+                </div>
+                <div class="field">
+                  <label for="setor">Setor</label>
+                  <input id="setor" name="setor" required maxlength="80" placeholder="Informe o setor">
+                </div>
+                <div class="field">
+                  <label for="solicitante">Solicitante</label>
+                  <input id="solicitante" name="solicitante" required maxlength="80" placeholder="Informe o nome do solicitante">
+                </div>
+                <div class="actions">
+                  <button type="submit" class="btn-accent">Criar</button>
+                </div>
+              </form>
+            </section>
+            <section class="card card-elev ws-center">
+              <div class="card-head">
+                <h2 class="card-title">Chamados</h2>
+              </div>
+              <div id="filtros" class="filters">
+                <button class="chip active" data-filter="ALL">Todos</button>
+                <button class="chip" data-filter="ABERTO">Aberto</button>
+                <button class="chip" data-filter="EM_ANDAMENTO">Em andamento</button>
+                <button class="chip" data-filter="FECHADO">Fechado</button>
+                <div class="tools">
+                  <button id="export" class="btn-glass">Exportar</button>
+                  <input id="import-file" type="file" accept=".csv,text/csv,application/json" style="display:none">
+                </div>
+              </div>
+              <div id="lista-header" class="list-footer" style="display:none"></div>
+              <div id="lista" class="lista"></div>
+              <div id="lista-footer" class="list-footer" style="display:none"></div>
+            </section>
+          </div>
+        </div>
+    <section id="dashboard-section" class="card card-elev" style="display:none">
+      <div class="card-head">
+        <h2 class="card-title">Dashboard</h2>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="kpi-title">Chamados criados</div><div class="kpi-value" id="kpi-total">0</div></div>
+        <div class="kpi"><div class="kpi-title">Em aberto</div><div class="kpi-value" id="kpi-abertos">0</div></div>
+        <div class="kpi"><div class="kpi-title">Em andamento</div><div class="kpi-value" id="kpi-em">0</div></div>
+        <div class="kpi"><div class="kpi-title">Resolvidos</div><div class="kpi-value" id="kpi-fechados">0</div></div>
+        <div class="kpi"><div class="kpi-title">Taxa de resolucao</div><div class="kpi-value" id="kpi-taxares">0%</div></div>
+        <div class="kpi"><div class="kpi-title">Atualizados (24h)</div><div class="kpi-value" id="kpi-24h">0</div></div>
+      </div>
+      <div class="charts">
+        <div class="chart">
+          <div class="chart-title">Chamados criados por hora</div>
+          <div id="chart-hour" class="bars"></div>
+          <div class="chart-xlabels" id="chart-hour-labels"></div>
+        </div>
+        <div class="chart">
+          <div class="chart-title">Media por dia da semana</div>
+          <div id="chart-weekday" class="bars"></div>
+          <div class="chart-xlabels" id="chart-weekday-labels"></div>
+        </div>
+      </div>
+    </section>
+      </main>
+      <div id="reply-dialog" class="reply hidden" role="dialog" aria-modal="true" aria-labelledby="reply-title">
+        <div class="reply-card">
+          <h3 id="reply-title">Responder Chamado</h3>
+          <textarea id="reply-text" rows="4" placeholder="Escreva sua resposta..."></textarea>
+          <div class="file-line">
+            <label for="reply-file">Anexar imagem (JPG/PNG):</label>
+            <input id="reply-file" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" style="display:none">
+            <div class="file-actions">
+              <button id="reply-pick" type="button" class="btn-accent">Escolher arquivo</button>
+              <span id="reply-fname" class="filename">Nenhum arquivo</span>
+            </div>
+          </div>
+          <div class="actions">
+            <button id="reply-cancel" class="btn-glass">Cancelar</button>
+            <button id="reply-send" class="btn-accent">Enviar</button>
+          </div>
+        </div>
+      </div>
+      <div id="img-viewer" class="img-viewer hidden" aria-hidden="true">
+        <div class="img-viewer-card">
+          <img id="img-viewer-img" alt="visualização do anexo">
+          <button id="img-viewer-close" class="btn-glass">Fechar</button>
+        </div>
+      </div>
+      <button id="to-top" class="to-top" aria-label="Voltar ao topo" title="Voltar ao topo">▲</button>
+      <div id="close-dialog" class="reply hidden" role="dialog" aria-modal="true" aria-labelledby="close-title">
+        <div class="reply-card">
+          <h3 id="close-title">Fechar Chamado</h3>
+          <div class="field">
+            <label for="close-name">Nome do atendente</label>
+            <input id="close-name" type="text" placeholder="Informe seu nome" maxlength="80" required>
+          </div>
+          <div class="actions">
+            <button id="close-cancel" class="btn-glass">Cancelar</button>
+            <button id="close-confirm" class="btn-accent">Confirmar</button>
+          </div>
+        </div>
+      </div>
+      <div id="login-dialog" class="reply hidden" role="dialog" aria-modal="true" aria-labelledby="login-title">
+        <div class="reply-card">
+          <h3 id="login-title">Entrar</h3>
+          <div class="field">
+            <label for="login-cpf">CPF</label>
+            <input id="login-cpf" type="text" placeholder="000.000.000-00" maxlength="11" inputmode="numeric" pattern="\\d{11}">
+          </div>
+          <div class="field">
+            <label for="login-pass">Senha</label>
+            <input id="login-pass" type="password" placeholder="Sua senha" maxlength="64">
+          </div>
+          <div class="field">
+            <label for="login-role">Perfil</label>
+            <select id="login-role">
+              <option value="user">Solicitante</option>
+              <option value="admin">Atendente</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button id="login-cancel" class="btn-glass">Cancelar</button>
+            <button id="login-confirm" class="btn-accent">Entrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="tour" class="tour hidden">
+    <div class="tour-card">
+      <div class="tour-step" data-step="1">
+        <h3>Bem-vindo ao Oasis Fluid</h3>
+        <p>Crie chamados rapidamente. Use N para novo, / para buscar, e 1-4 para filtrar.</p>
+        <button class="btn-accent tour-next">Continuar</button>
+      </div>
+      <div class="tour-step hidden" data-step="2">
+        <h3>Filtros e Acoes</h3>
+        <p>Filtre por status, exporte ou importe seus chamados e gerencie tudo localmente.</p>
+        <button class="btn-accent tour-close">Comecar</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="src/main.js"></script>
+  <noscript>Habilite JavaScript para usar a aplicação.</noscript>
+  <footer class="foot">Armazena dados no seu navegador (localStorage).</footer>
+</body>
+</html>
